@@ -15,4 +15,4 @@ export const transactions: Transaction[]=[
     category: "Salary",
     date: "2026-03-02",
   },
-]
+];
