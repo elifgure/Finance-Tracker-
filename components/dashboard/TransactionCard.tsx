@@ -4,8 +4,46 @@ import { motion } from "framer-motion";
 import { cn } from "@/utils/utils";
 import { Card, CardContent } from "@/components/ui/card";
 
-export default function TransactionCard({ t }: { t: Transaction }) {
+import { useState, useEffect } from "react";
+
+interface Rates {
+  [key: string]: number;
+}
+
+export default function TransactionCard({ t, displayCurrency }: { t: Transaction, displayCurrency: string }) {
   const Icon = categoryIcons[t.category.toLowerCase()];
+  const [rates, setRates] = useState<Rates>({ TRY: 1, USD: 0.03, EUR: 0.028 });
+
+  useEffect(() => {
+    const fetchRates = async () => {
+      try {
+        const res = await fetch("https://open.er-api.com/v6/latest/TRY");
+        const data = await res.json();
+        if (data.rates) {
+          setRates(data.rates);
+        }
+      } catch (error) {
+        console.error("Kurlar alınamadı:", error);
+      }
+    };
+    fetchRates();
+  }, []);
+
+  const getConvertedAmount = () => {
+    const amount = t.amount;
+    const tCurrency = t.currency || "TRY";
+
+    if (tCurrency === displayCurrency) return amount;
+
+    const amountInTRY = tCurrency === "TRY" ? amount : amount / (rates[tCurrency] || 1);
+    return amountInTRY * (rates[displayCurrency] || 1);
+  };
+
+  const symbols: { [key: string]: string } = {
+    TRY: "₺",
+    USD: "$",
+    EUR: "€",
+  };
 
   return (
     <motion.div 
@@ -22,19 +60,22 @@ export default function TransactionCard({ t }: { t: Transaction }) {
             </div>
 
             <div>
-              <p className="font-bold text-base text-foreground group-hover:text-primary transition-colors italic-none font-sans lowercase capitalize ">{t.category}</p>
-              <p className="text-xs font-semibold text-slate-400 dark:text-slate-500">{t.date}</p>
+              <p className="font-bold text-base text-foreground group-hover:text-primary transition-colors capitalize">{t.category}</p>
+              <p className="text-xs font-semibold text-slate-400 dark:text-slate-500">{new Date(t.date).toLocaleDateString('tr-TR')}</p>
             </div>
           </div>
 
-          <p
-            className={cn(
-              "text-lg font-black tracking-tighter",
-              t.type === "income" ? "text-emerald-500" : "text-rose-500"
-            )}
-          >
-            {t.type === "income" ? "+" : "-"}${t.amount.toLocaleString()}
-          </p>
+          <div className="flex flex-col items-end">
+            <p
+              className={cn(
+                "text-lg font-black tracking-tighter",
+                t.type === "income" ? "text-emerald-500" : "text-rose-500"
+              )}
+            >
+              {t.type === "income" ? "+" : "-"}{getConvertedAmount().toLocaleString(undefined, { maximumFractionDigits: 2 })} {symbols[displayCurrency]}
+            </p>
+            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">{t.type === "income" ? "Gelir" : "Gider"}</p>
+          </div>
         </CardContent>
       </Card>
     </motion.div>
