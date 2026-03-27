@@ -81,7 +81,7 @@ export default function AddTransactionModal({ type, onAdd }: AddTransactionModal
       <DialogTrigger asChild>
         <Button 
           variant={type === "income" ? "default" : "destructive"} 
-          className="w-full py-5 text-sm font-bold rounded-xl flex gap-1.5 shadow-lg hover:translate-y-[-2px] transition-all"
+          className="w-full py-5 text-sm text-black font-bold rounded-xl flex gap-1.5 shadow-lg hover:translate-y-[-2px] transition-all"
         >
           {type === "income" ? (
             <PlusCircle size={18} />
@@ -105,7 +105,7 @@ export default function AddTransactionModal({ type, onAdd }: AddTransactionModal
               name="date"
               type="date"
               required
-              className="bg-background/50 border-none h-12 rounded-xl text-foreground"
+              className="bg-background/50 border-none h-12 rounded-xl text-foreground [color-scheme:dark]"
             />
           </div>
           
@@ -115,9 +115,9 @@ export default function AddTransactionModal({ type, onAdd }: AddTransactionModal
               <SelectTrigger className="bg-background/50 border-none h-12 rounded-xl text-foreground">
                 <SelectValue placeholder="Kategori seçin" />
               </SelectTrigger>
-              <SelectContent className="bg-card/95 backdrop-blur-xl border-slate-200/10 shadow-2xl">
+              <SelectContent className="bg-card/95 backdrop-blur-xl border-white/10 shadow-2xl">
                 {categories.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
+                  <SelectItem key={cat} value={cat} className="focus:bg-primary focus:text-black transition-colors font-bold">
                     {cat}
                   </SelectItem>
                 ))}
@@ -143,9 +143,9 @@ export default function AddTransactionModal({ type, onAdd }: AddTransactionModal
                 <SelectTrigger className="bg-background/50 border-none h-12 rounded-xl text-foreground">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-card/95 backdrop-blur-xl border-slate-200/10 shadow-2xl">
+                <SelectContent className="bg-card/95 backdrop-blur-xl border-white/10 shadow-2xl">
                   {currencies.map((curr) => (
-                    <SelectItem key={curr.value} value={curr.value}>
+                    <SelectItem key={curr.value} value={curr.value} className="focus:bg-primary focus:text-black transition-colors font-bold">
                       {curr.label}
                     </SelectItem>
                   ))}
@@ -157,7 +157,7 @@ export default function AddTransactionModal({ type, onAdd }: AddTransactionModal
           <Button 
             disabled={loading}
             type="submit" 
-            className="w-full h-14 text-lg font-bold rounded-xl shadow-lg"
+            className="w-full h-14 text-lg font-bold rounded-xl shadow-lg text-black"
           >
             {loading ? <Loader2 className="animate-spin" /> : "Kaydet"}
           </Button>

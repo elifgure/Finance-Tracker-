@@ -38,30 +38,34 @@ export default function CategoryShowcase({ transactions, displayCurrency }: Cate
   if (categoryData.length === 0) return null;
 
   return (
-    <div className="mt-12">
-      <h2 className="text-xl font-bold text-foreground mb-6">Kategorilere Göre Harcamalar</h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+    <div className="mt-12 mb-12">
+      <div className="flex items-center justify-between mb-8">
+        <h2 className="text-xl font-black neon-text uppercase tracking-tighter">Kategori Dağılımı</h2>
+        <div className="h-[1px] flex-1 mx-6 bg-gradient-to-r from-primary/30 to-transparent" />
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
         {categoryData.map((cat, index) => {
           const Icon = categoryIcons[cat.name] || categoryIcons["unknown"];
           return (
             <motion.div
               key={cat.name}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: index * 0.05 }}
-              whileHover={{ y: -5 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1, type: "spring", stiffness: 100 }}
+              whileHover={{ y: -8, scale: 1.02 }}
             >
-              <Card className="border-none bg-card/40 backdrop-blur-md rounded-2xl overflow-hidden hover:bg-card/60 transition-all border border-white/5">
-                <CardContent className="p-4 flex flex-col items-center text-center gap-2">
-                  <div className="p-3 bg-primary/10 text-primary rounded-xl">
-                    <Icon size={24} />
+              <Card className="border-none bg-card/30 backdrop-blur-xl rounded-[2rem] overflow-hidden hover:bg-card/50 transition-all border border-white/5 group relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <CardContent className="p-6 flex flex-col items-center text-center gap-4 relative z-10">
+                  <div className="p-4 bg-primary/10 text-primary rounded-2xl group-hover:bg-primary group-hover:text-black transition-all duration-500 shadow-lg group-hover:shadow-primary/20">
+                    <Icon size={28} strokeWidth={2.5} />
                   </div>
-                  <div>
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-tighter capitalize">
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest capitalize">
                       {cat.name}
                     </p>
-                    <p className="text-sm font-black text-foreground">
-                      {cat.total.toLocaleString()} {symbols[displayCurrency]}
+                    <p className="text-lg font-black text-white group-hover:scale-110 transition-transform">
+                      {cat.total.toLocaleString()} <span className="text-primary text-xs">{symbols[displayCurrency]}</span>
                     </p>
                   </div>
                 </CardContent>

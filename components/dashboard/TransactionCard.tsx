@@ -49,32 +49,41 @@ export default function TransactionCard({ t, displayCurrency }: { t: Transaction
     <motion.div 
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
-      whileHover={{ scale: 1.01 }}
+      whileHover={{ scale: 1.02 }}
       className="group"
     >
-      <Card className="border-none shadow-sm group-hover:shadow-md transition-all duration-300 bg-card/60 backdrop-blur-xl rounded-2xl overflow-hidden">
-        <CardContent className="p-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-primary/10 text-primary rounded-xl transition-colors group-hover:bg-primary group-hover:text-white">
-              {Icon && <Icon size={22} />}
+      <Card className="border border-white/5 shadow-none transition-all duration-500 bg-card/20 backdrop-blur-xl rounded-3xl overflow-hidden hover:border-primary/30 hover:bg-card/40">
+        <CardContent className="p-5 flex items-center justify-between">
+          <div className="flex items-center gap-5">
+            <div className="p-4 bg-background/50 text-primary rounded-2xl transition-all duration-500 group-hover:bg-primary group-hover:text-black shadow-inner border border-white/5">
+              {Icon && <Icon size={24} strokeWidth={2.5} />}
             </div>
 
-            <div>
-              <p className="font-bold text-base text-foreground group-hover:text-primary transition-colors capitalize">{t.category}</p>
-              <p className="text-xs font-semibold text-slate-400 dark:text-slate-500">{new Date(t.date).toLocaleDateString('tr-TR')}</p>
+            <div className="space-y-1">
+              <p className="font-black text-sm text-slate-200 group-hover:text-white transition-colors capitalize tracking-tight">{t.category}</p>
+              <div className="flex items-center gap-2">
+                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{new Date(t.date).toLocaleDateString('tr-TR')}</p>
+                <span className="w-1 h-1 rounded-full bg-slate-700" />
+                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{t.type === "income" ? "Nakit Akışı" : "Harcama"}</p>
+              </div>
             </div>
           </div>
 
           <div className="flex flex-col items-end">
             <p
               className={cn(
-                "text-lg font-black tracking-tighter",
-                t.type === "income" ? "text-emerald-500" : "text-rose-500"
+                "text-xl font-black tracking-tighter transition-all group-hover:scale-110",
+                t.type === "income" ? "text-emerald-400" : "text-rose-400"
               )}
             >
-              {t.type === "income" ? "+" : "-"}{getConvertedAmount().toLocaleString(undefined, { maximumFractionDigits: 2 })} {symbols[displayCurrency]}
+              {t.type === "income" ? "+" : "-"}{getConvertedAmount().toLocaleString(undefined, { maximumFractionDigits: 2 })} <span className="text-xs opacity-50">{symbols[displayCurrency]}</span>
             </p>
-            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">{t.type === "income" ? "Gelir" : "Gider"}</p>
+            <div className={cn(
+              "text-[9px] font-black uppercase tracking-[0.2em] px-2 py-0.5 rounded-full border",
+              t.type === "income" ? "text-emerald-500/80 border-emerald-500/20 bg-emerald-500/5" : "text-rose-500/80 border-rose-500/20 bg-rose-500/5"
+            )}>
+              {t.type === "income" ? "Gelir" : "Gider"}
+            </div>
           </div>
         </CardContent>
       </Card>

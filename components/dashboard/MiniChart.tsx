@@ -34,12 +34,15 @@ interface TooltipProps {
 const CustomTooltip = ({ active, payload, label, displayCurrency }: TooltipProps) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-card/95 backdrop-blur-md border border-white/10 p-3 rounded-xl shadow-xl">
-        <p className="text-xs font-bold mb-2 text-secondary-foreground">{label}</p>
+      <div className="bg-card/95 backdrop-blur-md border border-white/10 p-4 rounded-xl shadow-2xl">
+        <p className="text-xs font-bold mb-2 text-slate-400 uppercase tracking-tighter">{label}</p>
         {payload.map((entry, index: number) => (
-          <p key={index} className="text-sm font-black" style={{ color: entry.color }}>
-            {entry.name === "income" ? "Gelir" : "Gider"}: {entry.value.toLocaleString()} {displayCurrency}
-          </p>
+          <div key={index} className="flex items-center gap-2 mb-1">
+            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
+            <p className="text-sm font-black" style={{ color: entry.color }}>
+              {entry.name === "income" ? "Gelir" : "Gider"}: {entry.value.toLocaleString()} {displayCurrency}
+            </p>
+          </div>
         ))}
       </div>
     );
@@ -51,11 +54,14 @@ export default function MiniChart({ transactions, displayCurrency }: MiniChartPr
   const chartData = useMemo(() => {
     const summary: { [key: string]: { income: number; expense: number } } = {};
 
-    const sortedTransactions = [...transactions].sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-    );
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
 
-    sortedTransactions.slice(-10).forEach((t) => {
+    const sortedTransactions = [...transactions]
+      .filter(t => new Date(t.date) >= oneMonthAgo)
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    sortedTransactions.forEach((t) => {
       const dateStr = new Date(t.date).toLocaleDateString("tr-TR", {
         day: "numeric",
         month: "short",
@@ -63,10 +69,11 @@ export default function MiniChart({ transactions, displayCurrency }: MiniChartPr
       if (!summary[dateStr]) {
         summary[dateStr] = { income: 0, expense: 0 };
       }
+      const amount = t.amount;
       if (t.type === "income") {
-        summary[dateStr].income += t.amount;
+        summary[dateStr].income += amount;
       } else {
-        summary[dateStr].expense += t.amount;
+        summary[dateStr].expense += amount;
       }
     });
 
@@ -78,66 +85,65 @@ export default function MiniChart({ transactions, displayCurrency }: MiniChartPr
   }, [transactions]);
 
   return (
-    <Card className="border-none shadow-sm bg-card/60 backdrop-blur-xl rounded-2xl flex flex-col h-full overflow-hidden">
+    <Card className="border-none shadow-sm bg-card/40 backdrop-blur-xl rounded-2xl flex flex-col h-full overflow-hidden border border-white/5 neon-card-glow">
       <CardHeader className="pb-2 flex flex-row items-center justify-between">
-        <CardTitle className="text-sm font-bold text-slate-400 uppercase tracking-wider">
-          Finansal Akış Trendi
+        <CardTitle className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] neon-text">
+          Finansal Analiz
         </CardTitle>
+        <Link href="/grafik" className="text-[10px] font-bold text-primary flex items-center hover:opacity-80 transition-opacity">
+          Tüm Grafikleri Gör <ChevronRight className="h-3 w-3 ml-1" />
+        </Link>
       </CardHeader>
       <CardContent className="flex-1 pb-2">
-        <div className="h-[200px] w-full">
+        <div className="h-[220px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                  <stop offset="5%" stopColor="#05ed99" stopOpacity={0.4}/>
+                  <stop offset="95%" stopColor="#05ed99" stopOpacity={0}/>
                 </linearGradient>
                 <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#f43f5e" stopOpacity={0}/>
+                  <stop offset="5%" stopColor="#ef4444" stopOpacity={0.2}/>
+                  <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(5, 237, 153, 0.05)" />
               <XAxis 
                 dataKey="name" 
                 axisLine={false} 
                 tickLine={false} 
                 tick={{ fill: "#64748b", fontSize: 10, fontWeight: 600 }}
+                dy={10}
               />
               <YAxis 
                 axisLine={false} 
                 tickLine={false} 
                 tick={{ fill: "#64748b", fontSize: 10, fontWeight: 600 }}
               />
-              <Tooltip content={<CustomTooltip displayCurrency={displayCurrency} />} />
-              <Area 
-                type="monotone" 
-                dataKey="income" 
-                stroke="#10b981" 
-                strokeWidth={3}
-                fillOpacity={1} 
-                fill="url(#colorIncome)" 
+              <Tooltip content={<CustomTooltip displayCurrency={displayCurrency} />} cursor={{ stroke: "rgba(5, 237, 153, 0.2)", strokeWidth: 2 }} />
+              <Area
+                type="monotone"
+                dataKey="income"
+                stroke="#05ed99"
+                strokeWidth={4}
+                fillOpacity={1}
+                fill="url(#colorIncome)"
+                animationDuration={1500}
               />
-              <Area 
-                type="monotone" 
-                dataKey="expense" 
-                stroke="#f43f5e" 
-                strokeWidth={3}
-                fillOpacity={1} 
-                fill="url(#colorExpense)" 
+              <Area
+                type="monotone"
+                dataKey="expense"
+                stroke="#ef4444"
+                strokeWidth={2}
+                fillOpacity={1}
+                fill="url(#colorExpense)"
+                strokeDasharray="5 5"
+                animationDuration={1500}
               />
             </AreaChart>
           </ResponsiveContainer>
         </div>
-        
-        <Link 
-          href="/grafik" 
-          className="flex items-center justify-center gap-1 mt-4 py-2 text-xs font-bold text-primary hover:bg-primary/5 rounded-xl transition-colors border border-primary/10"
-        >
-          Tüm Grafikleri Gör
-          <ChevronRight size={14} />
-        </Link>
       </CardContent>
     </Card>
   );

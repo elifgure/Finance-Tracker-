@@ -29,8 +29,14 @@ export default function DateRangeSummary({
   displayCurrency, 
   onCurrencyChange 
 }: DateRangeSummaryProps) {
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [startDate, setStartDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 7);
+    return d.toISOString().split('T')[0];
+  });
+  const [endDate, setEndDate] = useState(() => {
+    return new Date().toISOString().split('T')[0];
+  });
   const [rates, setRates] = useState<Rates>({ TRY: 1, USD: 0.03, EUR: 0.028 });
   const [loadingRates, setLoadingRates] = useState(false);
 
@@ -104,76 +110,88 @@ export default function DateRangeSummary({
 
   return (
     <div className="space-y-6 h-full flex flex-col">
-      <Card className="border-none shadow-sm bg-card/60 backdrop-blur-xl rounded-2xl flex-1 flex flex-col">
+      <Card className="border-none shadow-sm bg-card/40 backdrop-blur-xl rounded-3xl flex-1 flex flex-col border border-white/5 neon-card-glow">
         <CardHeader className="pb-4 flex flex-row items-center justify-between">
-          <CardTitle className="text-xl font-extrabold">Tarih Aralığı Analizi</CardTitle>
-          <div className="flex items-center gap-2">
-            {loadingRates && <RefreshCw size={14} className="animate-spin text-muted-foreground" />}
+          <CardTitle className="text-xl font-black neon-text uppercase tracking-tight">Finansal Özet</CardTitle>
+          <div className="flex items-center gap-3 bg-background/40 p-1.5 rounded-xl border border-white/5">
+            {loadingRates && <RefreshCw size={12} className="animate-spin text-primary" />}
             <Select value={displayCurrency} onValueChange={onCurrencyChange}>
-              <SelectTrigger className="w-[80px] h-8 bg-background/50 border-none rounded-lg text-xs font-bold">
+              <SelectTrigger className="w-[90px] h-7 bg-transparent border-none rounded-lg text-xs font-black focus:ring-0">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-card/95 backdrop-blur-xl border-slate-200/10">
-                <SelectItem value="TRY">TRY (₺)</SelectItem>
-                <SelectItem value="USD">USD ($)</SelectItem>
-                <SelectItem value="EUR">EUR (€)</SelectItem>
+              <SelectContent className="bg-card/95 backdrop-blur-xl border-white/10 rounded-xl overflow-hidden">
+                <SelectItem value="TRY" className="text-xs font-bold hover:bg-primary/20 hover:text-black">TRY (₺)</SelectItem>
+                <SelectItem value="USD" className="text-xs font-bold hover:bg-primary/20 hover:text-black">USD ($)</SelectItem>
+                <SelectItem value="EUR" className="text-xs font-bold hover:bg-primary/20 hover:text-black">EUR (€)</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </CardHeader>
         <CardContent className="flex-1 flex flex-col justify-between">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
             <div className="space-y-2">
-              <Label htmlFor="start" className="font-bold text-xs text-slate-400 uppercase tracking-widest px-1">Başlangıç Tarihi</Label>
+              <Label htmlFor="start" className="font-bold text-[10px] text-slate-500 uppercase tracking-[0.2em] px-1">Başlangıç Tarihi</Label>
               <Input
                 id="start"
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="bg-background/50 border-none h-12 rounded-xl text-sm font-medium"
+                className="bg-background/30 border-white/5 h-12 rounded-xl text-xs font-bold focus:border-primary/50 transition-all cursor-pointer [color-scheme:dark]"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="end" className="font-bold text-xs text-slate-400 uppercase tracking-widest px-1">Bitiş Tarihi</Label>
+              <Label htmlFor="end" className="font-bold text-[10px] text-slate-500 uppercase tracking-[0.2em] px-1">Bitiş Tarihi</Label>
               <Input
                 id="end"
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="bg-background/50 border-none h-12 rounded-xl text-sm font-medium"
+                className="bg-background/30 border-white/5 h-12 rounded-xl text-xs font-bold focus:border-primary/50 transition-all cursor-pointer [color-scheme:dark]"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-2">
-            <div className="p-6 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex flex-col justify-between min-h-[120px]">
-              <div className="flex items-center gap-2 text-emerald-600 mb-2">
-                <TrendingUp size={20} />
-                <span className="text-xs font-black uppercase tracking-tighter text-emerald-600/80">Toplam Gelir</span>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-4">
+            <div className="p-8 rounded-3xl bg-emerald-500/5 border border-emerald-500/10 flex flex-col justify-between min-h-[140px] group hover:bg-emerald-500/10 transition-all overflow-hidden">
+              <div className="flex items-center gap-2 text-emerald-500 mb-2">
+                <div className="p-2 rounded-lg bg-emerald-500/10">
+                  <TrendingUp size={18} />
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-widest">Gelirler</span>
               </div>
-              <p className="text-3xl font-black text-emerald-600 tracking-tighter">
-                +{summary.income.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })} {symbols[displayCurrency]}
-              </p>
+              <div>
+                <p className="font-black text-emerald-100 mb-1 group-hover:scale-105 transition-transform origin-left text-[min(3xl,5vw)] whitespace-nowrap overflow-visible">
+                  {summary.income.toLocaleString()} {symbols[displayCurrency]}
+                </p>
+              </div>
             </div>
 
-            <div className="p-6 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex flex-col justify-between min-h-[120px]">
-              <div className="flex items-center gap-2 text-rose-600 mb-2">
-                <TrendingDown size={20} />
-                <span className="text-xs font-black uppercase tracking-tighter text-rose-600/80">Toplam Gider</span>
+            <div className="p-8 rounded-3xl bg-red-500/5 border border-red-500/10 flex flex-col justify-between min-h-[140px] group hover:bg-red-500/10 transition-all">
+              <div className="flex items-center gap-2 text-red-500 mb-2">
+                <div className="p-2 rounded-lg bg-red-500/10">
+                  <TrendingDown size={18} />
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-widest">Giderler</span>
               </div>
-              <p className="text-3xl font-black text-rose-600 tracking-tighter">
-                -{summary.expense.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })} {symbols[displayCurrency]}
-              </p>
+              <div>
+                <p className="font-black text-red-100 mb-1 group-hover:scale-105 transition-transform origin-left text-[min(3xl,5vw)] whitespace-nowrap overflow-visible">
+                  {summary.expense.toLocaleString()} {symbols[displayCurrency]}
+                </p>
+              </div>
             </div>
 
-            <div className="p-6 rounded-2xl bg-primary/10 border border-primary/20 flex flex-col justify-between min-h-[120px]">
+            <div className="p-8 rounded-3xl bg-primary/5 border border-primary/20 flex flex-col justify-between min-h-[140px] group hover:bg-primary/10 transition-all">
               <div className="flex items-center gap-2 text-primary mb-2">
-                <Wallet size={20} />
-                <span className="text-xs font-black uppercase tracking-tighter text-primary/80">Net Durum</span>
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Wallet size={18} />
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-widest">Bakiye</span>
               </div>
-              <p className={`text-3xl font-black tracking-tighter ${summary.balance >= 0 ? "text-emerald-600" : "text-rose-600"}`}>
-                {summary.balance >= 0 ? "+" : ""}{summary.balance.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })} {symbols[displayCurrency]}
-              </p>
+              <div>
+                <p className="font-black text-white mb-1 group-hover:scale-105 transition-transform origin-left neon-text text-[min(3xl,5vw)] whitespace-nowrap overflow-visible">
+                  {summary.balance.toLocaleString()} {symbols[displayCurrency]}
+                </p>
+              </div>
             </div>
           </div>
         </CardContent>
