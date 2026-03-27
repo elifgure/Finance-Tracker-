@@ -12,7 +12,7 @@ export async function GET(req: Request) {
     }
 
     await connectToDatabase();
-    const transactions = await Transaction.find({ userId: (session.user as any).id }).sort({ date: -1 });
+    const transactions = await Transaction.find({ userId: session.user.id }).sort({ date: -1 });
 
     return NextResponse.json(transactions);
   } catch (error) {
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
 
     await connectToDatabase();
     const newTransaction = await Transaction.create({
-      userId: (session.user as any).id,
+      userId: session.user.id,
       type,
       amount,
       category,

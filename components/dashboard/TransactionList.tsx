@@ -21,7 +21,7 @@ export default function TransactionList({ transactions, displayCurrency }: Trans
           {transactions.length > 0 ? (
             transactions.map((t, index) => (
               <motion.div
-                key={(t as any)._id || index}
+                key={t._id || t.id || index}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}

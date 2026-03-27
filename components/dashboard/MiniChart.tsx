@@ -9,8 +9,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Defs,
-  LinearGradient,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Transaction } from "@/types/transaction";
@@ -21,6 +19,33 @@ interface MiniChartProps {
   transactions: Transaction[];
   displayCurrency: string;
 }
+
+interface TooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    name: string;
+    value: number;
+    color: string;
+  }>;
+  label?: string;
+  displayCurrency?: string;
+}
+
+const CustomTooltip = ({ active, payload, label, displayCurrency }: TooltipProps) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-card/95 backdrop-blur-md border border-white/10 p-3 rounded-xl shadow-xl">
+        <p className="text-xs font-bold mb-2 text-secondary-foreground">{label}</p>
+        {payload.map((entry, index: number) => (
+          <p key={index} className="text-sm font-black" style={{ color: entry.color }}>
+            {entry.name === "income" ? "Gelir" : "Gider"}: {entry.value.toLocaleString()} {displayCurrency}
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
 
 export default function MiniChart({ transactions, displayCurrency }: MiniChartProps) {
   const chartData = useMemo(() => {
@@ -51,22 +76,6 @@ export default function MiniChart({ transactions, displayCurrency }: MiniChartPr
       expense: data.expense,
     }));
   }, [transactions]);
-
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-card/95 backdrop-blur-md border border-white/10 p-3 rounded-xl shadow-xl">
-          <p className="text-xs font-bold mb-2 text-secondary-foreground">{label}</p>
-          {payload.map((entry: any, index: number) => (
-            <p key={index} className="text-sm font-black" style={{ color: entry.color }}>
-              {entry.name === "income" ? "Gelir" : "Gider"}: {entry.value.toLocaleString()} {displayCurrency}
-            </p>
-          ))}
-        </div>
-      );
-    }
-    return null;
-  };
 
   return (
     <Card className="border-none shadow-sm bg-card/60 backdrop-blur-xl rounded-2xl flex flex-col h-full overflow-hidden">
@@ -101,7 +110,7 @@ export default function MiniChart({ transactions, displayCurrency }: MiniChartPr
                 tickLine={false} 
                 tick={{ fill: "#64748b", fontSize: 10, fontWeight: 600 }}
               />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip content={<CustomTooltip displayCurrency={displayCurrency} />} />
               <Area 
                 type="monotone" 
                 dataKey="income" 
