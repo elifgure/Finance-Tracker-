@@ -1,8 +1,24 @@
-import { FaCar, FaHome, FaMoneyBillWave, FaUtensils } from "react-icons/fa";
+import { 
+  ShoppingBag, 
+  Wallet, 
+  Home, 
+  User, 
+  Utensils, 
+  Car,
+  TrendingUp,
+  CreditCard,
+  PlusCircle,
+  LucideIcon
+} from "lucide-react";
 
-export const categoryIcons: Record<string, any> ={
-food: FaUtensils,
-salary: FaMoneyBillWave,
-transportation: FaCar,
-rent: FaHome,
+export const categoryIcons: Record<string, LucideIcon> = {
+  market: ShoppingBag,
+  maaş: Wallet,
+  "ek gelir": TrendingUp,
+  kira: Home,
+  kişisel: User,
+  yemek: Utensils,
+  yol: Car,
+  ekstra: CreditCard,
+  unknown: PlusCircle
 };

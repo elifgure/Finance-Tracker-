@@ -32,11 +32,11 @@ export default function UserProfile() {
     : "U";
 
   return (
-    <div className="fixed top-6 right-6 z-50">
+    <div className="relative">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="relative h-12 w-auto flex items-center gap-3 px-2 hover:bg-white/20 rounded-2xl transition-all duration-300">
-            <span className="hidden md:block text-sm font-bold text-foreground">
+            <span className="hidden lg:block text-sm font-bold text-foreground">
               {session.user?.name}
             </span>
             <Avatar className="h-10 w-10 border-2 border-primary/20 shadow-sm">

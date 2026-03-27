@@ -81,12 +81,12 @@ export default function AddTransactionModal({ type, onAdd }: AddTransactionModal
       <DialogTrigger asChild>
         <Button 
           variant={type === "income" ? "default" : "destructive"} 
-          className="w-full py-6 text-lg font-bold rounded-2xl flex gap-2"
+          className="w-full py-5 text-sm font-bold rounded-xl flex gap-1.5 shadow-lg hover:translate-y-[-2px] transition-all"
         >
           {type === "income" ? (
-            <PlusCircle size={22} />
+            <PlusCircle size={18} />
           ) : (
-            <MinusCircle size={22} />
+            <MinusCircle size={18} />
           )}
           {type === "income" ? "Gelir Ekle" : "Gider Ekle"}
         </Button>
