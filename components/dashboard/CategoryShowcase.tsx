@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Transaction } from "@/types/transaction";
 import { categoryIcons } from "@/utils/categoryIcons";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,23 +11,54 @@ interface CategoryShowcaseProps {
   displayCurrency: string;
 }
 
+interface Rates {
+  [key: string]: number;
+}
+
 export default function CategoryShowcase({ transactions, displayCurrency }: CategoryShowcaseProps) {
+  const [rates, setRates] = useState<Rates>({ TRY: 1, USD: 0.03, EUR: 0.028 });
+
+  useEffect(() => {
+    const fetchRates = async () => {
+      try {
+        const res = await fetch("https://open.er-api.com/v6/latest/TRY");
+        const data = await res.json();
+        if (data.rates) {
+          setRates(data.rates);
+        }
+      } catch (error) {
+        console.error("Kurlar alınamadı:", error);
+      }
+    };
+    fetchRates();
+  }, []);
+
   const categoryData = useMemo(() => {
     const categories: { [key: string]: number } = {};
     
+    const getConvertedAmount = (t: Transaction) => {
+      const amount = t.amount;
+      const tCurrency = t.currency || "TRY";
+
+      if (tCurrency === displayCurrency) return amount;
+
+      const amountInTRY = tCurrency === "TRY" ? amount : amount / (rates[tCurrency] || 1);
+      return amountInTRY * (rates[displayCurrency] || 1);
+    };
+
     transactions.forEach((t) => {
       // SADECE GİDERLERİ (expense) FİLTRELE
       if (t.type === "expense") {
         const cat = t.category.toLowerCase();
         if (!categories[cat]) categories[cat] = 0;
-        categories[cat] += t.amount;
+        categories[cat] += getConvertedAmount(t);
       }
     });
 
     return Object.entries(categories)
       .map(([name, total]) => ({ name, total }))
       .sort((a, b) => b.total - a.total);
-  }, [transactions]);
+  }, [transactions, displayCurrency, rates]);
 
   const symbols: { [key: string]: string } = {
     TRY: "₺",
@@ -65,7 +96,7 @@ export default function CategoryShowcase({ transactions, displayCurrency }: Cate
                       {cat.name}
                     </p>
                     <p className="text-lg font-black text-white group-hover:scale-110 transition-transform">
-                      {cat.total.toLocaleString()} <span className="text-primary text-xs">{symbols[displayCurrency]}</span>
+                      {cat.total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-primary text-xs">{symbols[displayCurrency]}</span>
                     </p>
                   </div>
                 </CardContent>

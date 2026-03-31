@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   AreaChart,
   Area,
@@ -18,6 +18,10 @@ import { ChevronRight } from "lucide-react";
 interface MiniChartProps {
   transactions: Transaction[];
   displayCurrency: string;
+}
+
+interface Rates {
+  [key: string]: number;
 }
 
 interface TooltipProps {
@@ -51,11 +55,36 @@ const CustomTooltip = ({ active, payload, label, displayCurrency }: TooltipProps
 };
 
 export default function MiniChart({ transactions, displayCurrency }: MiniChartProps) {
+  const [rates, setRates] = useState<Rates>({ TRY: 1, USD: 0.03, EUR: 0.028 });
+
+  useEffect(() => {
+    const fetchRates = async () => {
+      try {
+        const res = await fetch("https://open.er-api.com/v6/latest/TRY");
+        const data = await res.json();
+        if (data.rates) {
+          setRates(data.rates);
+        }
+      } catch (error) {
+        console.error("Kurlar alınamadı:", error);
+      }
+    };
+    fetchRates();
+  }, []);
+
   const chartData = useMemo(() => {
     const summary: { [key: string]: { income: number; expense: number } } = {};
 
     const oneMonthAgo = new Date();
     oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+    const getConvertedAmount = (t: Transaction) => {
+      const amount = t.amount;
+      const tCurrency = t.currency || "TRY";
+      if (tCurrency === displayCurrency) return amount;
+      const amountInTRY = tCurrency === "TRY" ? amount : amount / (rates[tCurrency] || 1);
+      return amountInTRY * (rates[displayCurrency] || 1);
+    };
 
     const sortedTransactions = [...transactions]
       .filter(t => new Date(t.date) >= oneMonthAgo)
@@ -69,20 +98,20 @@ export default function MiniChart({ transactions, displayCurrency }: MiniChartPr
       if (!summary[dateStr]) {
         summary[dateStr] = { income: 0, expense: 0 };
       }
-      const amount = t.amount;
+      const convertedAmount = getConvertedAmount(t);
       if (t.type === "income") {
-        summary[dateStr].income += amount;
+        summary[dateStr].income += convertedAmount;
       } else {
-        summary[dateStr].expense += amount;
+        summary[dateStr].expense += convertedAmount;
       }
     });
 
     return Object.entries(summary).map(([name, data]) => ({
       name,
-      income: data.income,
-      expense: data.expense,
+      income: Number(data.income.toFixed(2)),
+      expense: Number(data.expense.toFixed(2)),
     }));
-  }, [transactions]);
+  }, [transactions, displayCurrency, rates]);
 
   return (
     <Card className="border-none shadow-sm bg-card/40 backdrop-blur-xl rounded-2xl flex flex-col h-full overflow-hidden border border-white/5 neon-card-glow">
@@ -138,7 +167,6 @@ export default function MiniChart({ transactions, displayCurrency }: MiniChartPr
                 strokeWidth={2}
                 fillOpacity={1}
                 fill="url(#colorExpense)"
-                strokeDasharray="5 5"
                 animationDuration={1500}
               />
             </AreaChart>
