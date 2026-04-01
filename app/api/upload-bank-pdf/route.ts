@@ -91,8 +91,7 @@ ONEMLI:
     
     for (const line of lines) {
       try {
-        const parts = line.split("|").map(s => s.trim());
-        if (parts.length < 3) continue;
+const parts = line.split("|").map((s: string) => s.trim());        if (parts.length < 3) continue;
         
         const [dateStr, category, amountStr, typeStr, desc] = parts;
         const amount = parseFloat(amountStr.replace(/[^0-9.,-]/g, "").replace(",", "."));
