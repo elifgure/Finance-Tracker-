@@ -18,6 +18,9 @@ interface DateRangeSummaryProps {
   transactions: Transaction[];
   displayCurrency: string;
   onCurrencyChange: (currency: string) => void;
+  startDate: string;
+  endDate: string;
+  onDateChange: (start: string, end: string) => void;
 }
 
 interface Rates {
@@ -27,16 +30,11 @@ interface Rates {
 export default function DateRangeSummary({ 
   transactions, 
   displayCurrency, 
-  onCurrencyChange 
+  onCurrencyChange,
+  startDate,
+  endDate,
+  onDateChange
 }: DateRangeSummaryProps) {
-  const [startDate, setStartDate] = useState(() => {
-    const d = new Date();
-    d.setDate(d.getDate() - 7);
-    return d.toISOString().split('T')[0];
-  });
-  const [endDate, setEndDate] = useState(() => {
-    return new Date().toISOString().split('T')[0];
-  });
   const [rates, setRates] = useState<Rates>({ TRY: 1, USD: 0.03, EUR: 0.028 });
   const [loadingRates, setLoadingRates] = useState(false);
 
@@ -109,14 +107,14 @@ export default function DateRangeSummary({
   }, [transactions, startDate, endDate, displayCurrency, rates]);
 
   return (
-    <div className="space-y-6 h-full flex flex-col">
-      <Card className="border-none shadow-sm bg-card/40 backdrop-blur-xl rounded-3xl flex-1 flex flex-col border border-white/5 neon-card-glow">
-        <CardHeader className="pb-4 flex flex-row items-center justify-between">
-          <CardTitle className="text-xl font-black neon-text uppercase tracking-tight">Finansal Özet</CardTitle>
-          <div className="flex items-center gap-3 bg-background/40 p-1.5 rounded-xl border border-white/5">
-            {loadingRates && <RefreshCw size={12} className="animate-spin text-primary" />}
+    <div className="space-y-4 sm:space-y-6 h-full flex flex-col">
+      <Card className="border-none shadow-sm bg-card/40 backdrop-blur-xl rounded-2xl sm:rounded-3xl flex-1 flex flex-col border border-white/5 neon-card-glow">
+        <CardHeader className="pb-3 sm:pb-4 flex flex-row items-center justify-between">
+          <CardTitle className="text-base sm:text-lg md:text-xl font-black neon-text uppercase tracking-tight">Finansal Özet</CardTitle>
+          <div className="flex items-center gap-2 sm:gap-3 bg-background/40 p-1 sm:p-1.5 rounded-lg sm:rounded-xl border border-white/5">
+            {loadingRates && <RefreshCw size={10} className="animate-spin text-primary sm:w-3 sm:h-3" />}
             <Select value={displayCurrency} onValueChange={onCurrencyChange}>
-              <SelectTrigger className="w-[90px] h-7 bg-transparent border-none rounded-lg text-xs font-black focus:ring-0">
+              <SelectTrigger className="w-[70px] sm:w-[90px] h-6 sm:h-7 bg-transparent border-none rounded-lg text-[10px] sm:text-xs font-black focus:ring-0">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-card/95 backdrop-blur-xl border-white/10 rounded-xl overflow-hidden">
@@ -128,67 +126,67 @@ export default function DateRangeSummary({
           </div>
         </CardHeader>
         <CardContent className="flex-1 flex flex-col justify-between">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
-            <div className="space-y-2">
-              <Label htmlFor="start" className="font-bold text-[10px] text-slate-500 uppercase tracking-[0.2em] px-1">Başlangıç Tarihi</Label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8 md:mb-10">
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="start" className="font-bold text-[9px] sm:text-[10px] text-slate-500 uppercase tracking-[0.15em] sm:tracking-[0.2em] px-1">Başlangıç Tarihi</Label>
               <Input
                 id="start"
                 type="date"
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="bg-background/30 border-white/5 h-12 rounded-xl text-xs font-bold focus:border-primary/50 transition-all cursor-pointer [color-scheme:dark]"
+                onChange={(e) => onDateChange(e.target.value, endDate)}
+                className="bg-background/30 border-white/5 h-10 sm:h-11 md:h-12 rounded-xl text-[10px] sm:text-xs font-bold focus:border-primary/50 transition-all cursor-pointer [color-scheme:dark]"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="end" className="font-bold text-[10px] text-slate-500 uppercase tracking-[0.2em] px-1">Bitiş Tarihi</Label>
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="end" className="font-bold text-[9px] sm:text-[10px] text-slate-500 uppercase tracking-[0.15em] sm:tracking-[0.2em] px-1">Bitiş Tarihi</Label>
               <Input
                 id="end"
                 type="date"
                 value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="bg-background/30 border-white/5 h-12 rounded-xl text-xs font-bold focus:border-primary/50 transition-all cursor-pointer [color-scheme:dark]"
+                onChange={(e) => onDateChange(startDate, e.target.value)}
+                className="bg-background/30 border-white/5 h-10 sm:h-11 md:h-12 rounded-xl text-[10px] sm:text-xs font-bold focus:border-primary/50 transition-all cursor-pointer [color-scheme:dark]"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-4">
-            <div className="p-8 rounded-3xl bg-emerald-500/5 border border-emerald-500/10 flex flex-col justify-between min-h-[140px] group hover:bg-emerald-500/10 transition-all overflow-hidden">
-              <div className="flex items-center gap-2 text-emerald-500 mb-2">
-                <div className="p-2 rounded-lg bg-emerald-500/10">
-                  <TrendingUp size={18} />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-4">
+            <div className="p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl bg-emerald-500/5 border border-emerald-500/10 flex flex-col justify-between min-h-[100px] sm:min-h-[120px] md:min-h-[140px] group hover:bg-emerald-500/10 transition-all overflow-hidden">
+              <div className="flex items-center gap-1.5 sm:gap-2 text-emerald-500 mb-1 sm:mb-2">
+                <div className="p-1.5 sm:p-2 rounded-lg bg-emerald-500/10">
+                  <TrendingUp size={14} className="sm:w-4 sm:h-4 md:w-[18px] md:h-[18px]" />
                 </div>
-                <span className="text-[10px] font-black uppercase tracking-widest">Gelirler</span>
+                <span className="text-[8px] sm:text-[9px] md:text-[10px] font-black uppercase tracking-widest">Gelirler</span>
               </div>
               <div>
-                <p className="font-black text-emerald-100 mb-1 group-hover:scale-105 transition-transform origin-left text-[min(3xl,5vw)] whitespace-nowrap overflow-visible">
+                <p className="font-black text-emerald-100 mb-1 group-hover:scale-105 transition-transform origin-left text-xl sm:text-2xl md:text-3xl whitespace-nowrap overflow-visible">
                   {summary.income.toLocaleString()} {symbols[displayCurrency]}
                 </p>
               </div>
             </div>
 
-            <div className="p-8 rounded-3xl bg-red-500/5 border border-red-500/10 flex flex-col justify-between min-h-[140px] group hover:bg-red-500/10 transition-all">
-              <div className="flex items-center gap-2 text-red-500 mb-2">
-                <div className="p-2 rounded-lg bg-red-500/10">
-                  <TrendingDown size={18} />
+            <div className="p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl bg-red-500/5 border border-red-500/10 flex flex-col justify-between min-h-[100px] sm:min-h-[120px] md:min-h-[140px] group hover:bg-red-500/10 transition-all">
+              <div className="flex items-center gap-1.5 sm:gap-2 text-red-500 mb-1 sm:mb-2">
+                <div className="p-1.5 sm:p-2 rounded-lg bg-red-500/10">
+                  <TrendingDown size={14} className="sm:w-4 sm:h-4 md:w-[18px] md:h-[18px]" />
                 </div>
-                <span className="text-[10px] font-black uppercase tracking-widest">Giderler</span>
+                <span className="text-[8px] sm:text-[9px] md:text-[10px] font-black uppercase tracking-widest">Giderler</span>
               </div>
               <div>
-                <p className="font-black text-red-100 mb-1 group-hover:scale-105 transition-transform origin-left text-[min(3xl,5vw)] whitespace-nowrap overflow-visible">
+                <p className="font-black text-red-100 mb-1 group-hover:scale-105 transition-transform origin-left text-xl sm:text-2xl md:text-3xl whitespace-nowrap overflow-visible">
                   {summary.expense.toLocaleString()} {symbols[displayCurrency]}
                 </p>
               </div>
             </div>
 
-            <div className="p-8 rounded-3xl bg-primary/5 border border-primary/20 flex flex-col justify-between min-h-[140px] group hover:bg-primary/10 transition-all">
-              <div className="flex items-center gap-2 text-primary mb-2">
-                <div className="p-2 rounded-lg bg-primary/10">
-                  <Wallet size={18} />
+            <div className="p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl bg-primary/5 border border-primary/20 flex flex-col justify-between min-h-[100px] sm:min-h-[120px] md:min-h-[140px] group hover:bg-primary/10 transition-all">
+              <div className="flex items-center gap-1.5 sm:gap-2 text-primary mb-1 sm:mb-2">
+                <div className="p-1.5 sm:p-2 rounded-lg bg-primary/10">
+                  <Wallet size={14} className="sm:w-4 sm:h-4 md:w-[18px] md:h-[18px]" />
                 </div>
-                <span className="text-[10px] font-black uppercase tracking-widest">Bakiye</span>
+                <span className="text-[8px] sm:text-[9px] md:text-[10px] font-black uppercase tracking-widest">Bakiye</span>
               </div>
               <div>
-                <p className="font-black text-white mb-1 group-hover:scale-105 transition-transform origin-left neon-text text-[min(3xl,5vw)] whitespace-nowrap overflow-visible">
+                <p className="font-black text-white mb-1 group-hover:scale-105 transition-transform origin-left neon-text text-xl sm:text-2xl md:text-3xl whitespace-nowrap overflow-visible">
                   {summary.balance.toLocaleString()} {symbols[displayCurrency]}
                 </p>
               </div>

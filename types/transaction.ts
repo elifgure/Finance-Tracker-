@@ -8,4 +8,5 @@ export interface Transaction {
   category: string;
   date: string;
   currency?: string;
+  description?: string;
 }

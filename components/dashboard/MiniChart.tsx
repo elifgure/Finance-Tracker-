@@ -18,6 +18,8 @@ import { ChevronRight } from "lucide-react";
 interface MiniChartProps {
   transactions: Transaction[];
   displayCurrency: string;
+  startDate: string;
+  endDate: string;
 }
 
 interface Rates {
@@ -54,7 +56,7 @@ const CustomTooltip = ({ active, payload, label, displayCurrency }: TooltipProps
   return null;
 };
 
-export default function MiniChart({ transactions, displayCurrency }: MiniChartProps) {
+export default function MiniChart({ transactions, displayCurrency, startDate, endDate }: MiniChartProps) {
   const [rates, setRates] = useState<Rates>({ TRY: 1, USD: 0.03, EUR: 0.028 });
 
   useEffect(() => {
@@ -75,9 +77,6 @@ export default function MiniChart({ transactions, displayCurrency }: MiniChartPr
   const chartData = useMemo(() => {
     const summary: { [key: string]: { income: number; expense: number } } = {};
 
-    const oneMonthAgo = new Date();
-    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-
     const getConvertedAmount = (t: Transaction) => {
       const amount = t.amount;
       const tCurrency = t.currency || "TRY";
@@ -87,7 +86,15 @@ export default function MiniChart({ transactions, displayCurrency }: MiniChartPr
     };
 
     const sortedTransactions = [...transactions]
-      .filter(t => new Date(t.date) >= oneMonthAgo)
+      .filter(t => {
+        if (!startDate && !endDate) return true;
+        const date = new Date(t.date);
+        const start = startDate ? new Date(startDate) : null;
+        const end = endDate ? new Date(endDate) : null;
+        if (start && date < start) return false;
+        if (end && date > end) return false;
+        return true;
+      })
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
     sortedTransactions.forEach((t) => {
@@ -111,7 +118,7 @@ export default function MiniChart({ transactions, displayCurrency }: MiniChartPr
       income: Number(data.income.toFixed(2)),
       expense: Number(data.expense.toFixed(2)),
     }));
-  }, [transactions, displayCurrency, rates]);
+  }, [transactions, displayCurrency, rates, startDate, endDate]);
 
   return (
     <Card className="border-none shadow-sm bg-card/40 backdrop-blur-xl rounded-2xl flex flex-col h-full overflow-hidden border border-white/5 neon-card-glow">

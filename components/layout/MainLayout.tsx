@@ -19,9 +19,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300 relative">
       <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-background/40 backdrop-blur-2xl">
-        <div className="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 h-16 sm:h-20 md:h-24 flex items-center justify-between">
           {/* Sol: Logo */}
-          <Link href="/" className="relative w-48 h-20 flex-shrink-0 group">
+          <Link href="/" className="relative w-28 sm:w-36 md:w-44 lg:w-48 h-12 sm:h-16 md:h-20 flex-shrink-0 group">
             <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
             <Image 
               src="/images/FinanceAI-logo-transparent.png" 
@@ -39,7 +39,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "px-6 py-2.5 rounded-[1.5rem] text-[11px] font-black uppercase tracking-[0.2em] transition-all duration-300",
+                  "px-4 xl:px-6 py-2 xl:py-2.5 rounded-[1.5rem] text-[10px] xl:text-[11px] font-black uppercase tracking-[0.15em] xl:tracking-[0.2em] transition-all duration-300",
                   pathname === item.href 
                     ? "bg-primary text-black shadow-lg shadow-primary/20" 
                     : "text-white/30 hover:text-primary hover:bg-white/5"
@@ -51,15 +51,15 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           </nav>
 
           {/* Sağ: Profil */}
-          <div className="flex items-center gap-6">
-            <div className="flex-shrink-0 p-1 bg-gradient-to-tr from-primary/20 to-transparent rounded-full border border-white/5">
+          <div className="flex items-center gap-3 sm:gap-4 md:gap-6">
+            <div className="flex-shrink-0 p-0.5 sm:p-1 bg-gradient-to-tr from-primary/20 to-transparent rounded-full border border-white/5">
               <UserProfile />
             </div>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-6 sm:py-8 md:py-12">
         <motion.main
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}

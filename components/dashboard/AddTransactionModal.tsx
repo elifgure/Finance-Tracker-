@@ -81,23 +81,23 @@ export default function AddTransactionModal({ type, onAdd }: AddTransactionModal
       <DialogTrigger asChild>
         <Button 
           variant={type === "income" ? "default" : "destructive"} 
-          className="w-full py-5 text-sm text-black font-bold rounded-xl flex gap-1.5 shadow-lg hover:translate-y-[-2px] transition-all"
+          className="w-full py-4 sm:py-5 md:py-6 text-xs sm:text-sm md:text-base text-black font-bold rounded-xl flex gap-1 sm:gap-1.5 shadow-lg hover:translate-y-[-2px] transition-all"
         >
           {type === "income" ? (
-            <PlusCircle size={18} />
+            <PlusCircle size={16} className="sm:w-[18px] sm:h-[18px]" />
           ) : (
-            <MinusCircle size={18} />
+            <MinusCircle size={16} className="sm:w-[18px] sm:h-[18px]" />
           )}
           {type === "income" ? "Gelir Ekle" : "Gider Ekle"}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] bg-card/95 backdrop-blur-xl border-none shadow-2xl rounded-3xl text-foreground">
+      <DialogContent className="w-[90vw] sm:max-w-[425px] bg-card/95 backdrop-blur-xl border-none shadow-2xl rounded-2xl sm:rounded-3xl text-foreground">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-black text-center">
+          <DialogTitle className="text-xl sm:text-2xl font-black text-center">
             {type === "income" ? "Gelir Bildir" : "Gider Bildir"}
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-6 pt-4">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 pt-4">
           <div className="space-y-2">
             <Label htmlFor="date">Tarih</Label>
             <Input

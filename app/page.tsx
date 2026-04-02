@@ -14,6 +14,14 @@ export default function Home() {
   const [transactions, setTransactions] = useState<TransactionType[]>([]);
   const [displayCurrency, setDisplayCurrency] = useState("TRY");
   const [loading, setLoading] = useState(true);
+  const [startDate, setStartDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 7);
+    return d.toISOString().split('T')[0];
+  });
+  const [endDate, setEndDate] = useState(() => {
+    return new Date().toISOString().split('T')[0];
+  });
 
   const fetchTransactions = async () => {
     try {
@@ -31,6 +39,34 @@ export default function Home() {
 
   useEffect(() => {
     fetchTransactions();
+
+    // PDF yüklemesi olduğunda localStorage'dan kontrol et
+    const checkPdfUpload = () => {
+      const pdfUploaded = localStorage.getItem('pdfUploaded');
+      if (pdfUploaded === 'true') {
+        localStorage.removeItem('pdfUploaded');
+        fetchTransactions();
+      }
+    };
+
+    // İlk mount'ta kontrol et
+    checkPdfUpload();
+
+    // Her 5 saniyede bir kontrol et (PDF upload olmuş mu diye)
+    const interval = setInterval(checkPdfUpload, 5000);
+
+    // Sayfa odağa geldiğinde transactions'ları yenile
+    const handleFocus = () => {
+      checkPdfUpload();
+      fetchTransactions();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      clearInterval(interval);
+    };
   }, []);
 
   if (loading) {
@@ -51,7 +87,12 @@ export default function Home() {
             <AddTransactionModal type="expense" onAdd={fetchTransactions} />
           </div>
           <div className="flex-1">
-            <MiniChart transactions={transactions} displayCurrency={displayCurrency} />
+            <MiniChart 
+              transactions={transactions} 
+              displayCurrency={displayCurrency}
+              startDate={startDate}
+              endDate={endDate}
+            />
           </div>
         </div>
 
@@ -61,6 +102,12 @@ export default function Home() {
             transactions={transactions} 
             onCurrencyChange={setDisplayCurrency}
             displayCurrency={displayCurrency}
+            startDate={startDate}
+            endDate={endDate}
+            onDateChange={(start, end) => {
+              setStartDate(start);
+              setEndDate(end);
+            }}
           />
         </div>
       </div>
@@ -69,6 +116,7 @@ export default function Home() {
         <TransactionList 
           transactions={transactions} 
           displayCurrency={displayCurrency}
+          onRefresh={fetchTransactions}
         />
       </div>
 
