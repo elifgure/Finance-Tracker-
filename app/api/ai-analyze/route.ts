@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     }
 
     const modelsData = await modelsRes.json();
-    const availableModel = modelsData.models?.find((m: any) => 
+    const availableModel = modelsData.models?.find((m: { name: string; supportedGenerationMethods?: string[] }) => 
       m.name.includes('gemini') && m.name.includes('flash')
     );
 

@@ -128,7 +128,8 @@ export default function GrafikPage() {
 
   const COLORS = ['#22c55e', '#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'];
 
-  const renderLabel = (entry: any) => {
+  const renderLabel = (entry: { percent?: number }) => {
+    if (!entry.percent) return '';
     return `${(entry.percent * 100).toFixed(1)}%`;
   };
 

@@ -119,7 +119,7 @@ ORNEK (DIREKT ISLEMLE BASLA):
     console.log("AI CEVABI UZUNLUK:", rawText.length);
     
     // Metin temizleme: Markdown, başlıklar, açıklamalar
-    let cleanedText = rawText
+    const cleanedText = rawText
       .replace(/```[a-z]*\n?/g, "")           // Markdown kod bloklarını kaldır
       .replace(/^#+\s+.*/gm, "")              // Başlıkları kaldır
       .replace(/^\*+\s+.*/gm, "")             // Bullet point'leri kaldır
@@ -162,7 +162,7 @@ ORNEK (DIREKT ISLEMLE BASLA):
         const desc = parts.length >= 5 ? parts.slice(4).join(" ") : parts[1]; // Eğer açıklama yoksa kategori adını kullan
         
         // Miktar parsing - hem Türkçe (3.750,00) hem İngilizce (3750.00) formatı destekle
-        let cleanAmount = amountStr.replace(/[^0-9.,\-]/g, "");
+        const cleanAmount = amountStr.replace(/[^0-9.,\-]/g, "");
         let amount: number;
         
         if (cleanAmount.includes(",") && cleanAmount.includes(".")) {
